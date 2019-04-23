@@ -9,6 +9,7 @@ public class Jogador : MonoBehaviour {
 
     public float aceleracaoInicial = 0.02f;
     public float aceleracao = 0.01f;
+    public float desaceleracao = 0.07f;
 
     public float velocidadeRotacao = 130f;
 
@@ -25,7 +26,6 @@ public class Jogador : MonoBehaviour {
         //rotacao
         float h = Input.GetAxisRaw("Horizontal");
         Vector3 rotacao = Vector3.up * h * velocidadeRotacao * Time.deltaTime;
-        transform.Rotate(rotacao);
 
         //movimentacao
 
@@ -34,12 +34,21 @@ public class Jogador : MonoBehaviour {
         {
             velocidadeAtual += (velocidadeAtual == 0f) ? aceleracaoInicial : aceleracao;
         }
-        else if (v == 0)
+        else if (v == 0 && velocidadeAtual > 0)
         {
-            velocidadeAtual = 0f;
+            velocidadeAtual -= desaceleracao;
         }
 
+        velocidadeAtual = Mathf.Clamp(velocidadeAtual, 0, velocidadeMaxima);
+
+        if (velocidadeAtual > 0)
+        {
+            transform.Rotate(rotacao); 
+        }
 
         transform.Translate(Vector3.forward * velocidadeAtual * Time.deltaTime);
+
+        float valorAnimacao = Mathf.Clamp(velocidadeAtual / velocidadeMaxima, 0, 1);
+        animator.SetFloat("Speed", valorAnimacao);
 	}
 }
